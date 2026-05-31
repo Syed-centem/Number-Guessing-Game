@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Number</title>
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --hover-color: #4338CA;
+            --bg-color: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .game-container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            color: var(--text-main);
+            margin-top: 0;
+            font-size: 24px;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            text-align: center;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: var(--hover-color);
+        }
+
+        #message {
+            font-size: 18px;
+            font-weight: 600;
+            min-height: 27px;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        #attempts-display {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .success { color: #10B981 !important; }
+        .warning { color: #F59E0B !important; }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Guess the Number</h1>
+        <p>I'm thinking of a number between 1 and 100.</p>
+        
+        <div class="input-group">
+            <input type="number" id="guessInput" min="1" max="100" placeholder="e.g. 50" autofocus>
+            <button onclick="checkGuess()" id="guessBtn">Guess</button>
+        </div>
+
+        <div id="message"></div>
+        <div id="attempts-display">Attempts: <span id="attemptsCount">0</span></div>
+    </div>
+
+    <script>
+        // Game Logic (Translating your C code to JavaScript)
+        let targetNumber = Math.floor(Math.random() * 100) + 1;
+        let nGuesses = 0;
+        let isGameOver = false;
+
+        const guessInput = document.getElementById('guessInput');
+        const messageEl = document.getElementById('message');
+        const attemptsCountEl = document.getElementById('attemptsCount');
+        const guessBtn = document.getElementById('guessBtn');
+
+        // Allow pressing "Enter" to submit
+        guessInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                checkGuess();
+            }
+        });
+
+        function checkGuess() {
+            if (isGameOver) {
+                resetGame();
+                return;
+            }
+
+            const guess = parseInt(guessInput.value);
+
+            // Validation
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                messageEl.textContent = "Please enter a valid number between 1 and 100.";
+                messageEl.className = "warning";
+                return;
+            }
+
+            nGuesses++;
+            attemptsCountEl.textContent = nGuesses;
+
+            // Core logic from your C program
+            if (guess > targetNumber) {
+                messageEl.textContent = "Lower number please! ⬇️";
+                messageEl.className = "warning";
+            } else if (guess < targetNumber) {
+                messageEl.textContent = "Higher number please! ⬆️";
+                messageEl.className = "warning";
+            } else {
+                messageEl.innerHTML = `🎉 You guessed it in <strong>${nGuesses}</strong> attempts! 🎉`;
+                messageEl.className = "success";
+                endGame();
+            }
+            
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        function endGame() {
+            isGameOver = true;
+            guessInput.disabled = true;
+            guessBtn.textContent = "Play Again";
+        }
+
+        function resetGame() {
+            targetNumber = Math.floor(Math.random() * 100) + 1;
+            nGuesses = 0;
+            isGameOver = false;
+            
+            attemptsCountEl.textContent = nGuesses;
+            messageEl.textContent = "";
+            messageEl.className = "";
+            
+            guessInput.disabled = false;
+            guessInput.value = '';
+            guessBtn.textContent = "Guess";
+            guessInput.focus();
+        }
+    </script>
+</body>
+</html>
